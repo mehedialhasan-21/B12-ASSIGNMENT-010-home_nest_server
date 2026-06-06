@@ -1,52 +1,87 @@
-# 🏠 HomeNest — Real Estate Listing Portal
+# 🏠 HomeNest - Backend Server
 
-**Live Site:** [https://warmpaw-1b35b.web.app](https://warmpaw-1b35b.web.app)
-
-HomeNest is a full-stack real estate listing platform where property owners can post rentals and sale listings, and users can browse, search, and filter properties.
+Backend API server for HomeNest, a real estate listing platform where property owners can post rentals/sale listings and users can browse, search, and filter properties.
 
 ## ✨ Features
 
-- **Browse & Search Properties**: Explore all listings with backend-powered search by property name, filter by category (Rent/Sale/Commercial/Land/Villa etc.), and sort by price or date
-- **Full Authentication**: Email/password and Google OAuth login via Firebase — with protected routes that persist session on page reload
-- **Interactive Profile Settings**: Dedicated profile edit page (`/edit-profile`) to update display name and photo URL with a real-time preview and cross-layer state updates
-- **Complete CRUD for Listings**: Add, update, and delete your own property listings with image support; delete confirmation via SweetAlert; instant UI updates
-- **Ratings & Reviews System**: Leave 1–5 star ratings and written reviews on property detail pages; view all your past reviews on the My Ratings page
-- **Light & Dark Mode**: Full theme switching with CSS variables — preference is saved across sessions via localStorage
+- **Full CRUD Operations**: Create, Read, Update, and Delete property listings with complete data validation
+- **Authentication & Authorization**: Firebase Admin SDK token verification with JWT cookie-based sessions; ownership verification ensures users can only modify their own properties
+- **Advanced Search & Sort**: Backend-powered search by property name (case-insensitive regex), sort by price or date (ascending/descending), and filter by category — all processed server-side via MongoDB queries
+- **Ratings & Reviews System**: Users can rate properties (1–5 stars) with written reviews; average ratings are calculated per property; self-review prevention is enforced
+- **Production-Ready Security**: Helmet security headers, HTTP-only secure cookies with SameSite policy, CORS whitelisting, input validation, and graceful error handling
+- **Optimized MongoDB**: Pre-built indexes on frequently queried fields (email, category, price, date) for fast performance; pagination support with total count metadata
+- **Vercel Deployment Ready**: Pre-configured `vercel.json` for seamless serverless deployment
+
+---
 
 ## 🛠️ Tech Stack
 
 | Technology | Purpose |
 |---|---|
-| React 18 + Vite | Frontend framework |
-| React Router v6 | Client-side routing |
-| Firebase Auth | Authentication |
-| TanStack Query | Server state & caching |
-| Axios | HTTP requests |
-| Swiper.js | Hero carousel |
-| SweetAlert2 | Confirmation dialogs |
-| React Toastify | Toast notifications |
-| React Icons | Icon library |
+| Node.js | Runtime |
+| Express.js | Web framework |
+| MongoDB | Database (via native driver) |
+| Firebase Admin SDK | Token verification |
+| JSON Web Tokens | Session management |
+| Helmet | Security headers |
+| CORS | Cross-origin configuration |
+
+---
+
+
+### Properties
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/properties` | ❌ | All properties (search, sort, filter, paginate) |
+| GET | `/api/properties/featured` | ❌ | 6 newest properties |
+| GET | `/api/properties/user/:email` | ✅ | User's properties |
+| GET | `/api/properties/:id` | ✅ | Property details |
+| POST | `/api/properties` | ✅ | Add property |
+| PUT | `/api/properties/:id` | ✅ | Update property (owner only) |
+| DELETE | `/api/properties/:id` | ✅ | Delete property (owner only) |
+
+### Reviews
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/reviews` | ✅ | Add review/rating |
+| GET | `/api/reviews/property/:id` | ❌ | Reviews for a property |
+| GET | `/api/reviews/user/:email` | ✅ | User's reviews |
+| DELETE | `/api/reviews/:id` | ✅ | Delete review (author only) |
+
+---
 
 ## 🚀 Getting Started
 
+### Prerequisites
+- Node.js v18+
+- MongoDB Atlas account
+- Firebase project (optional, for Admin SDK)
+
+### Installation
+
 ```bash
-git clone <repo-url>
-cd client
+git clone <your-repo-url>
+cd server
 npm install
-npm run dev
 ```
 
-## 📁 Pages
+## 📁 Project Structure
 
-| Route | Page | Auth Required |
-|---|---|---|
-| `/` | Home (slider + featured) | No |
-| `/properties` | All Properties (search/sort/filter) | No |
-| `/properties/:id` | Property Details + Reviews | Yes |
-| `/add-property` | Add Property Form | Yes |
-| `/my-properties` | My Listings (update/delete) | Yes |
-| `/update-property/:id` | Edit Listing | Yes |
-| `/my-ratings` | My Reviews | Yes |
-| `/edit-profile` | Edit Profile Settings | Yes |
-| `/login` | Login | No |
-| `/register` | Register | No |
+```
+server/
+├── index.js                # Express app entry point
+├── package.json
+├── vercel.json             # Vercel deployment config
+├── .env                    # Environment variables
+├── .gitignore
+├── README.md
+├── config/
+│   └── firebase.js         # Firebase Admin SDK setup
+├── middleware/
+│   └── verifyToken.js      # JWT/Firebase auth middleware
+└── routes/
+    ├── auth.js             # Auth token routes
+    ├── users.js            # User profile routes
+    ├── properties.js       # Property CRUD routes
+    └── reviews.js          # Review/rating routes
+```
